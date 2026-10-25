@@ -62,7 +62,7 @@ The BMS board has failed. Proceed to path 3: generic 13S pack with the ESP32-C3.
 ## Pack-specific checklist
 
 - [ ] Meter A1 to A2 on the dock. Record voltage.
-- [ ] Step 1: charger connected for several hours. Record LED behavior.
+- [~] Step 1: charger connected. **Observed 2026-10-25 ~14:30:** LED ring at the charge port **steady red**, no flashing over a 3.7 s clip. Pack emits a short buzz about once every few minutes: ~1 s long, two bursts, tonal content around 2.4 to 2.6 kHz with mains-rate amplitude modulation, consistent with the on-board charger's switching stage or relay engaging and dropping out. Reading: BMS is awake and in charge mode (`0x13` = 2), not locked. Intermittent cycling rather than continuous charge suggests the charger is starting, hitting a limit (likely one low group or precharge), pausing, retrying. Still to record: time to green, or whether it never reaches green.
 - [ ] Step 2: paperclip test. Record beep count.
 - [ ] If locked: open case, record all 13 group voltages.
 - [ ] Record which step, if any, revived the pack.
