@@ -99,6 +99,20 @@ Suitable battery + BMS + charger (voltage still TBD)
 - [ ] Select throttle and display only after confirming the chosen translator firmware and required control functions.
 - [ ] Verify TRC/axle anti-rotation hardware, brakes, thermal monitoring, and safe low-power first operation.
 
+## 5a. Second bike (out of scope for the CAN retrofit)
+
+A second BionX-equipped bicycle arrived with the first. Identified 2026-10-25 from labels. It is a different generation and shares no electrical interface with the `3554` / `3562` system.
+
+| Item | Evidence | Finding | Confidence |
+|---|---|---|---|
+| Rear hub motor | Photo of label on hub cable | **BionX part no. `2276`, serial `A09286263`**. Decodes to 2009, Julian day 286 (October 13, 2009). Part number is below the CAN range `3350–4848`, so this is an **I2C motor** (PL-series). | Confirmed by photograph and dealer manual range |
+| Battery pack | Photo of pack label and barcode | **Li-Mn 26 V**, barcode `2297-A09299066`. Decodes to 2009, day 299 (October 26, 2009). 26 V Li-Mn is a **7S** pack. Factory pairing with the motor. | Confirmed by photograph |
+| Charger | Photo of label (see Section 1, second charger row) | **HighPower `HP8204B(7S)`, 29.4 VDC / 2 A** matches a 7S pack. This charger belongs to this bike, not to the `3562`. | Confirmed by voltage match |
+| Dock connector | Photo of pack underside | Two large power contacts plus a 5-pin signal block in one rectangular housing. I2C-era dock, not interchangeable with the 48 V rail. | Confirmed by photograph |
+| Deep Sleep | BX Legacy technical support | Pre-2013 Li-Mn packs have no Deep Sleep and need a top-up every 4 to 5 months. This pack has had no protection while in storage. | Documented behavior, pack condition unknown |
+
+**Decision:** Not part of the ESP32-C3 CAN project. Options are a stock revival with its own charger, a parts donor, or a second resto-mod on the I2C protocol later. If a stock revival is attempted, use only the `HP8204B(7S)` on this pack and only the `01-3635` on the `3562`.
+
 ## 6. Research references
 
 1. **BionX dealer service manual** — motor `3554` in CAN family; serial number fields; distinction between CAN and I²C; lower-voltage CAN configurations.  
