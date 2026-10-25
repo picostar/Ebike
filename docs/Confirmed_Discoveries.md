@@ -77,8 +77,11 @@ Suitable battery + BMS + charger (voltage still TBD)
 ```
 
 - **Microcontroller proposal:** ESP32-C3 with an **external CAN transceiver** (the ESP32-C3 has a TWAI CAN controller, but not a physical CAN transceiver). The CAN transceiver/interface must use appropriate logic levels and electrical protection.
-- **Known protocol reference:** BionXtool documents diagnostics/sniffing for BionX CAN systems and states a CAN bitrate of **125 kbit/s**. This is a published reference, not yet measured on this bicycle.
-- **Existing proof-of-concept reference:** The open-source **BionX Minimal Translator** describes driving a BionX CAN motor with a generic battery and a Kunteng display using an **STM32F103** board. Adapting it to ESP32-C3 is **proposed work**, not an already tested port.
+- **Known protocol reference:** BionXtool documents the BionX CAN protocol: **125 kbit/s**, 11-bit IDs, console `0x08` as master, battery `0x10`, motor `0x20`; query/reply/set frames of 2 or 4 bytes; a near-complete battery register map; and a capture of a stock power-on sequence. Published reference, not yet measured on this bicycle. Extracted to [BMS_Protocol.md](BMS_Protocol.md).
+- **Existing proof-of-concept reference:** The open-source **BionX Minimal Translator** drives a BionX CAN motor with a generic battery and a Kunteng display on an **STM32F103**. **Confirmed from its source on 2026-10-25: it talks only to motor node `0x20`, emulates no battery node, and feeds the motor's 12 V and 5 V rails from buck converters.** Adapting it to ESP32-C3 is **proposed work**, not an already tested port.
+- **Battery emulation is not required for the motor to run.** This follows from the Minimal Translator source. The earlier field report of the system shutting off every five minutes came from a setup that kept the stock console, whose inactivity timer is a battery register (`0x56/0x57`). Replacing the console removes that dependency. Emulating the battery node is needed only if the stock console is retained.
+- **No CAN command wakes a BMS in Deep Sleep.** The battery register map contains shutdown (`0x25`), ship mode (`0x37`) and timers, but no wake or unlock-from-lockout register. Deep Sleep exits only on external DC at the charge input. Deep Sleep entry triggers: 60 days idle, 7 days under 10% SoC, or average cell voltage under 2.54 V. The last is the deep-discharge lockout; recovery is external cell charging followed by the 26 V supply.
+- **Once awake, the BMS is fully diagnosable over CAN without opening the case:** alert flags mapped to console error codes (`0x1D/0xF0`), charger manager state (`0x13`), DC-in voltage (`0x9A/0x9B`), ship-mode flag (`0x37`), all 13 cell voltages via the cell-monitor gateway (`0x6C` → `0x6D/0x6E`). Protected writes go through `0x71` with a seconds value, never above `0x54`.
 - **Desired retained features:** Native motor torque-sensing pedal assist and regenerative braking, **if confirmed functional and supported by the final control interface**.
 - **Safety requirements:** No-motion on boot, throttle plausibility and out-of-range detection, brake override, CAN-command timeout, conservative torque/current limits, physical battery isolation and fusing, and testing with the drive wheel off the ground.
 
@@ -88,8 +91,9 @@ Suitable battery + BMS + charger (voltage still TBD)
 - [ ] Confirm the **motor controller's allowable DC voltage** beyond the factory 13S window (through exact model reference, diagnostic registers, or inspected electronics as necessary; motor remains unopened under current project scope). The factory pairing with a 13S pack establishes 13S as safe; no headroom above that is established.
 - [ ] Confirm **physical mating** of the classic-power and Hirose extension plugs with this particular motor.
 - [ ] With everything unpowered, map the extension wires to actual connector contacts using continuity tests; independently check the power and CAN terminals.
-- [ ] Determine whether the motor relies on a **separate low-voltage logic supply**, original battery wake/enable logic, CAN startup messages, or other BionX battery functions. Field reports point to ~5.5 V and ~12 V auxiliary rails from the pack plus periodic CAN battery frames; see [Battery_Revival.md](Battery_Revival.md).
-- [ ] Identify CAN protocol/firmware version and validate startup/command behavior with a protected bench setup.
+- [~] Determine whether the motor relies on a **separate low-voltage logic supply**, original battery wake/enable logic, CAN startup messages, or other BionX battery functions. **Partly resolved from source 2026-10-25:** the motor needs **12 V (vControl) and 5 V** rails that the BionX pack normally supplies, and the Minimal Translator provides them from buck converters. Periodic battery CAN frames are **not** required by the motor. Still to measure on this bike: which pins carry the rails, and the motor's own wake sequence (`SET 0x20 0x02`, `0x41`, `0x42`). See [BMS_Protocol.md](BMS_Protocol.md).
+- [ ] Identify CAN protocol/firmware version and validate startup/command behavior with a protected bench setup. The published motor power-on sequence is: `SET 0x02 = 0` (wake), `SET 0x41 = 0`, `SET 0x42 = 1` (direction), `QRY 0x20` (fw rev), `QRY 0x6C` (gauge type), `SET 0xA5 = 0xAA` (unlock, 30 s), then current limits into `0x7A`-`0x7D`.
+- [ ] If the original pack revives: capture a full stock power-on/off CAN trace with BionXtool before any other change.
 - [ ] Select final battery voltage, chemistry, BMS (including handling of regenerative current), fuse, charger and connectorized harness.
 - [ ] Select throttle and display only after confirming the chosen translator firmware and required control functions.
 - [ ] Verify TRC/axle anti-rotation hardware, brakes, thermal monitoring, and safe low-power first operation.
@@ -112,7 +116,11 @@ Suitable battery + BMS + charger (voltage still TBD)
    https://akkuplus.de/Akkureparatur-Zellentausch-BionX-4073-3562-3760-48-Volt-Li-Ion-Akku
 8. **akku-mainz.de BionX 3562 repair page** — second independent listing of `3562` as a 48 V pack.  
    https://akku-mainz.de/bionx-3562
+9. **BionXtool `registers.h`, `PROTOCOL.md`, `bike-on-off.pcap`** — battery register map, frame format, stock power-on capture (console fw 112, battery hw 0x63).  
+   https://github.com/buxtronix/BionXtool
+10. **BionX Minimal Translator `main.c`** — motor-only control loop, no battery node, 12 V / 5 V from buck converters.  
+    https://github.com/stancecoke/BionX_Minimal_Translator/blob/master/main.c
 
 ---
 
-**Project decision summary:** Retain the **BionX 3554 CAN-bus hub motor**, preserve its factory plugs, pursue a **classic-connector extension harness** and an **ESP32-C3 CAN control interface**. **Original pack confirmed as 48 V 13S (part `3562`).** The open battery question is now the CAN handshake with a non-BionX pack, not the voltage.
+**Project decision summary:** Retain the **BionX 3554 CAN-bus hub motor**, preserve its factory plugs, pursue a **classic-connector extension harness** and an **ESP32-C3 CAN control interface**. **Original pack confirmed as 48 V 13S (part `3562`).** **The motor runs without a battery node on the bus (Minimal Translator source), so tier-1 ESP32 scope is a motor-only control loop plus 12 V / 5 V rails.** Reviving the original pack is useful for a stock CAN capture and as a fallback battery, not a prerequisite.
