@@ -52,11 +52,12 @@ Worked for one ES user: raise pack voltage with an external CV/CC supply at low 
 - BBI can clear a locked BMS. Dealer-licensed. Ask BX Legacy whether they will run it on a shipped pack and at what price.
 - Only worth it if steps 1 to 3 show a healthy pack that still refuses to wake.
 
+### Between steps 1 and 3: read the BMS over CAN
+If step 1 or 2 shows any sign of life, tap CAN (battery pins 2/5/GND) and read the alert flags, charger status, DC-in voltage, ship-mode flag and all 13 cell voltages before opening the case. Register list and procedure in [BMS_Protocol.md](BMS_Protocol.md). This separates a sleeping pack, a deep-discharged pack and a failed board without a screwdriver.
+
 ### If all four fail
-The BMS board has failed. Proceed to path 3: generic 13S pack with the ESP32-C3 emulating battery CAN frames. The ES bypass experiments define the minimum the emulator must do:
-- Periodic battery frames (voltage, state of charge, wake) so the system does not shut off every 5 minutes.
-- CAN IDs to be taken from a bus dump. Without a live pack to dump, the BionX Minimal Translator source is the only reference.
-- One bypasser fed the BMS connector with ~5.5 V (red) and ~12 V (brown) auxiliary rails plus pack voltage on A1/A2, and had to leave the original BMS connected in parallel for the system to run. Treat this as evidence that the motor expects auxiliary logic rails from the battery, to be confirmed by continuity and voltage measurement on this pack.
+The BMS board has failed. Proceed to path 3: generic 13S pack with the ESP32-C3. Correction to the earlier working assumption: **the motor does not require a battery node on the bus.** The Minimal Translator runs the motor with no battery emulation, talking only to node `0x20`, and supplies the motor's 12 V and 5 V rails from step-down converters. The "shuts off every 5 minutes" report came from a setup that kept the stock console, whose inactivity timer lives in the battery. With the console replaced, that timer goes away. Details in BMS_Protocol.md.
+- The ~5.5 V and ~12 V rails the bypasser fed are the vControl and +5 V rails the pack normally supplies to the motor and console. Confirm by measuring the pack connector once awake (`0xAC/0xAD`, `0x4E/0x4F`).
 
 ## Pack-specific checklist
 

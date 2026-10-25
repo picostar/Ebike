@@ -4,7 +4,7 @@
 
 Goal: preserve the BionX 3554 CAN-bus hub motor and its internal controller. Investigate a reversible extension-cable interface for a modern battery, Hall thumb throttle, and new display. Original pack confirmed as BionX `3562`, 48 V nominal 13S4P Li-ion. CAN pinout and startup protocol remain **UNVERIFIED**.
 
-Discovery and connector sources: [Confirmed_Discoveries.md](docs/Confirmed_Discoveries.md). Original pack revival ladder: [Battery_Revival.md](docs/Battery_Revival.md).
+Discovery and connector sources: [Confirmed_Discoveries.md](docs/Confirmed_Discoveries.md). Original pack revival ladder: [Battery_Revival.md](docs/Battery_Revival.md). BMS CAN registers and wake/lockout behavior: [BMS_Protocol.md](docs/BMS_Protocol.md).
 
 ## Components
 - ESP32-C3 prototype controller
