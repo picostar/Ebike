@@ -1,6 +1,6 @@
 # Safety and validation gate
 
-- [ ] Identify battery chemistry, original nominal voltage and maximum pack voltage.
+- [x] Identify battery chemistry, original nominal voltage and maximum pack voltage. (2026-10-25: BionX `3562`, Li-ion 13S4P, 48 V nominal, ~54.6 V full.)
 - [ ] Verify internal BionX motor controller's permissible power input range.
 - [ ] Source genuine mating extension cables; independently verify genders/keying.
 - [ ] Continuity-map *every* power and Hirose contact with equipment unpowered.

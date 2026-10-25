@@ -2,7 +2,7 @@
 
 **BENCH-ONLY: does not control a motor.** 
 
-Goal: preserve the BionX 3554 CAN-bus hub motor and its internal controller. Investigate a reversible extension-cable interface for a modern battery, Hall thumb throttle, and new display. The original motor supply voltage, CAN pinout, and startup protocol remain **UNVERIFIED**.
+Goal: preserve the BionX 3554 CAN-bus hub motor and its internal controller. Investigate a reversible extension-cable interface for a modern battery, Hall thumb throttle, and new display. Original pack confirmed as BionX `3562`, 48 V nominal 13S4P Li-ion. CAN pinout and startup protocol remain **UNVERIFIED**.
 
 Discovery and connector sources: [Confirmed_Discoveries.md](docs/Confirmed_Discoveries.md).
 
@@ -19,7 +19,7 @@ The PlatformIO project only prints ADC readings from a 0–3.3 V bench potentiom
 To test: open firmware/ as a PlatformIO project, choose the actual ESP32-C3 board, connect a test potentiometer ends to 3.3 V and GND and the wiper to GPIO0, flash over USB, then open a 115200-baud serial monitor. Do not connect any unknown-voltage throttle or bike wiring.
 
 ## Development order
-1. Verify hub controller voltage tolerance, original battery cell count and motor power wiring.
+1. ~~Original battery cell count~~ (done: 13S, part `3562`). Verify hub controller headroom above 13S and motor power wiring.
 2. Purchase and continuity-map mating classic power and Hirose extension harnesses.
 3. Specify safe power supply, protection, braking, watchdog, and regenerative operation.
 4. Implement receive-only CAN observation with correct external transceiver, safe bus loading, and known-ground topology.

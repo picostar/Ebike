@@ -1,6 +1,6 @@
 # Proposed architecture — unverified
 
-1. Appropriate battery/BMS/fuse/isolator: voltage UNKNOWN until independently checked.
+1. Appropriate battery/BMS/fuse/isolator: 48 V nominal / 13S confirmed from original pack `3562`; BMS and CAN handshake with a non-BionX pack still open.
 2. Extension power harness to original motor power connection: wiring/polarity UNKNOWN until measured.
 3. External CAN PHY, isolated/protected as needed, to original Hirose motor connector: connector contacts UNKNOWN until measured.
 4. ESP32-C3 CAN/TWAI controller and hardware watchdog (not yet implemented).

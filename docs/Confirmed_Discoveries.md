@@ -16,6 +16,8 @@
 | Existing charger | Photo of charger label | **BionX `01-3635`, model `SA190B-24U`; output `26 V DC`, `3.45 A`, `89.7 W`; input `100–240 V AC`** | Confirmed by photograph |
 | Charger's intended battery family | BX Legacy listing for BionX `01-3635` | This **26 V power supply** is sold specifically for **BionX 48 V battery systems**. Its output rating does **not** mean the traction pack is 26 V. | Confirmed for charger model, not pack identity |
 | Battery and mounting | Photographs | White **rear-rack** battery enclosure and battery-rail/docking assembly; rail barcode label only partially legible (starts `01-357…`) | Confirmed physical configuration; partial ID |
+| Battery pack identity | Pack label read 2026-10-25 | **BionX part no. `3562`, serial `C11090387`**. Independent cell-replacement shops (akkuplus.de, akku-mainz.de) list `3562` with `4073` and `3760` as the **48 V Li-ion** family, built from **52 × 18650 cells = 13S4P**, and pair it with the SL 250 generation. | Confirmed by label plus two third-party listings |
+| Battery manufacture date | Pack serial, same format as motor serial | `C` = assembly-location field, `11` = **2011**, `090` = Julian day **90 (March 31, 2011)**, `387` = sequence. Ten weeks before the motor; motor and pack are a factory pairing. | High confidence, decoded |
 | Existing controls | Photographs | Original BionX **G1-style handlebar console** and thumb-operated control visible | Confirmed by photograph |
 | Motor connections | Photographs | Motor axle harness has **separate heavy-current power and miniature multipin communication connections** | Confirmed visually; exact wire assignment unverified |
 
@@ -23,11 +25,11 @@
 
 ## 2. Battery voltage: what is and is not established
 
-- **Confirmed:** The charger marked `01-3635` outputs **26 V DC** and is specified by BX Legacy for BionX **48 V battery systems**.
-- **Strong indication, not yet confirmed:** The bicycle may originally have had a **48 V** BionX traction battery, assuming this charger belongs to the pictured battery.
-- **Not confirmed:** The removable battery's actual voltage/chemistry/cell count; the `3554` motor's **permitted DC input-voltage range**; the internal controller's voltage tolerance; the present condition of the battery electronics.
-- **Do not conclude:** That the motor may automatically accept a generic 48 V pack simply because it uses CAN bus or the existing charger is associated with BionX 48 V batteries. BionX CAN-bus systems also existed at lower voltages.
-- **If 13S Li-ion is ultimately approved:** A conventional nominal-48-V (13S) pack reaches **54.6 V fully charged**. This is a *candidate design*, **not yet an approved replacement** for this motor.
+- **Confirmed:** The original pack is BionX part `3562`, a **48 V nominal, 13S4P Li-ion** rack battery (see Section 1). Fully charged it sat near **54.6 V**, so the `3554` motor has run at 13S voltage from the factory.
+- **Confirmed:** The charger marked `01-3635` outputs **26 V DC** and is specified by BX Legacy for BionX **48 V battery systems**. The `3562` pack carries its own charge electronics inside the case, which is why the external supply is 26 V.
+- **Not confirmed:** The `3554` controller's behavior with a **generic 13S pack that lacks the BionX BMS and CAN battery traffic**; whether the motor needs the pack's wake/enable or CAN startup messages to run; the present condition of the original pack's electronics.
+- **Do not conclude:** That a generic 48 V pack is a drop-in. The voltage matches, the protocol handshake is the open question. The BionX Minimal Translator project exists because the motor expects battery-side CAN traffic.
+- **Candidate replacement:** A conventional nominal-48-V (13S) pack now matches the original pack's voltage window. It remains a *candidate design* until the CAN startup requirement is understood.
 - **Charging:** The original 26 V BionX charger must **not** be wired directly to a conventional 13S battery/BMS. A generic battery requires a charger suitable for its chemistry and series-cell count.
 
 ## 3. Confirmed connector families and sourcing
@@ -82,8 +84,8 @@ Suitable battery + BMS + charger (voltage still TBD)
 
 ## 5. Outstanding verification before power-up
 
-- [ ] Find the **removable battery's complete model/voltage label** or otherwise identify its original cell arrangement.
-- [ ] Confirm the **motor controller's allowable DC voltage** (through exact model reference, diagnostic registers, or inspected electronics as necessary; motor remains unopened under current project scope).
+- [x] Find the **removable battery's complete model/voltage label** or otherwise identify its original cell arrangement. **Done 2026-10-25:** part `3562`, 48 V, 13S4P.
+- [ ] Confirm the **motor controller's allowable DC voltage** beyond the factory 13S window (through exact model reference, diagnostic registers, or inspected electronics as necessary; motor remains unopened under current project scope). The factory pairing with a 13S pack establishes 13S as safe; no headroom above that is established.
 - [ ] Confirm **physical mating** of the classic-power and Hirose extension plugs with this particular motor.
 - [ ] With everything unpowered, map the extension wires to actual connector contacts using continuity tests; independently check the power and CAN terminals.
 - [ ] Determine whether the motor relies on a **separate low-voltage logic supply**, original battery wake/enable logic, CAN startup messages, or other BionX battery functions.
@@ -106,7 +108,11 @@ Suitable battery + BMS + charger (voltage still TBD)
    https://github.com/buxtronix/BionXtool
 6. **BionX Minimal Translator** — existing STM32-based generic-battery / Kunteng-display CAN motor translator.  
    https://github.com/stancecoke/BionX_Minimal_Translator
+7. **akkuplus.de cell-swap listing** — BionX `4073` / `3562` / `3760` grouped as the 48 V Li-ion family, 52 × 18650 cells (13S4P).  
+   https://akkuplus.de/Akkureparatur-Zellentausch-BionX-4073-3562-3760-48-Volt-Li-Ion-Akku
+8. **akku-mainz.de BionX 3562 repair page** — second independent listing of `3562` as a 48 V pack.  
+   https://akku-mainz.de/bionx-3562
 
 ---
 
-**Project decision summary:** Retain the **BionX 3554 CAN-bus hub motor**, preserve its factory plugs, pursue a **classic-connector extension harness** and an **ESP32-C3 CAN control interface**. **48 V remains a leading battery hypothesis—not yet a verified safe supply voltage.**
+**Project decision summary:** Retain the **BionX 3554 CAN-bus hub motor**, preserve its factory plugs, pursue a **classic-connector extension harness** and an **ESP32-C3 CAN control interface**. **Original pack confirmed as 48 V 13S (part `3562`).** The open battery question is now the CAN handshake with a non-BionX pack, not the voltage.
