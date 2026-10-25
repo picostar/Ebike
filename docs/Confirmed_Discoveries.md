@@ -88,7 +88,7 @@ Suitable battery + BMS + charger (voltage still TBD)
 - [ ] Confirm the **motor controller's allowable DC voltage** beyond the factory 13S window (through exact model reference, diagnostic registers, or inspected electronics as necessary; motor remains unopened under current project scope). The factory pairing with a 13S pack establishes 13S as safe; no headroom above that is established.
 - [ ] Confirm **physical mating** of the classic-power and Hirose extension plugs with this particular motor.
 - [ ] With everything unpowered, map the extension wires to actual connector contacts using continuity tests; independently check the power and CAN terminals.
-- [ ] Determine whether the motor relies on a **separate low-voltage logic supply**, original battery wake/enable logic, CAN startup messages, or other BionX battery functions.
+- [ ] Determine whether the motor relies on a **separate low-voltage logic supply**, original battery wake/enable logic, CAN startup messages, or other BionX battery functions. Field reports point to ~5.5 V and ~12 V auxiliary rails from the pack plus periodic CAN battery frames; see [Battery_Revival.md](Battery_Revival.md).
 - [ ] Identify CAN protocol/firmware version and validate startup/command behavior with a protected bench setup.
 - [ ] Select final battery voltage, chemistry, BMS (including handling of regenerative current), fuse, charger and connectorized harness.
 - [ ] Select throttle and display only after confirming the chosen translator firmware and required control functions.
